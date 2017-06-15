@@ -369,7 +369,7 @@ zrtie_cmd(char *address, int rdonly, int zcache, char *pass, char *pfile, int pp
 
         tied_param->u.hash->tmpdata = (void *)rc_carrier;
         tied_param->gsu.h = &redis_hash_gsu;
-        addmodulefd(rc_carrier->fdesc, FDT_INTERNAL);
+        // addmodulefd(rc_carrier->fdesc, FDT_INTERNAL);
     } else {
         int tpe, tpe2, dummy_fd = 0;
         if (lazy) {
@@ -415,7 +415,7 @@ zrtie_cmd(char *address, int rdonly, int zcache, char *pass, char *pfile, int pp
                 rc_carrier->password = NULL;
 
             tied_param->gsu.s = (GsuScalar) rc_carrier;
-            addmodulefd(rc_carrier->fdesc, FDT_INTERNAL);
+            // addmodulefd(rc_carrier->fdesc, FDT_INTERNAL);
         } else if (tpe == DB_KEY_TYPE_SET) {
             if (!(tied_param = createparam(pmname, pmflags | PM_ARRAY | PM_SPECIAL))) {
                 zwarn("cannot create the requested array (for set) parameter: %s", pmname);
@@ -447,7 +447,7 @@ zrtie_cmd(char *address, int rdonly, int zcache, char *pass, char *pfile, int pp
                 rc_carrier->password = NULL;
 
             tied_param->gsu.s = (GsuScalar) rc_carrier;
-            addmodulefd(rc_carrier->fdesc, FDT_INTERNAL);
+            // addmodulefd(rc_carrier->fdesc, FDT_INTERNAL);
         } else if (tpe == DB_KEY_TYPE_ZSET) {
             /* Create hash */
             if (!(tied_param = createhash(pmname, pmflags, 1))) {
@@ -489,7 +489,7 @@ zrtie_cmd(char *address, int rdonly, int zcache, char *pass, char *pfile, int pp
 
             tied_param->u.hash->tmpdata = (void *)rc_carrier;
             tied_param->gsu.h = &hash_zset_gsu;
-            addmodulefd(rc_carrier->fdesc, FDT_INTERNAL);
+            // addmodulefd(rc_carrier->fdesc, FDT_INTERNAL);
         } else if (tpe == DB_KEY_TYPE_HASH) {
             /* Create hash */
             if (!(tied_param = createhash(pmname, pmflags, 2))) {
@@ -531,7 +531,7 @@ zrtie_cmd(char *address, int rdonly, int zcache, char *pass, char *pfile, int pp
 
             tied_param->u.hash->tmpdata = (void *)rc_carrier;
             tied_param->gsu.h = &hash_hset_gsu;
-            addmodulefd(rc_carrier->fdesc, FDT_INTERNAL);
+            // addmodulefd(rc_carrier->fdesc, FDT_INTERNAL);
         } else if (tpe == DB_KEY_TYPE_LIST) {
             if (!(tied_param = createparam(pmname, pmflags | PM_ARRAY | PM_SPECIAL))) {
                 zwarn("cannot create the requested array (for list) parameter: %s", pmname);
@@ -563,7 +563,7 @@ zrtie_cmd(char *address, int rdonly, int zcache, char *pass, char *pfile, int pp
                 rc_carrier->password = NULL;
 
             tied_param->gsu.s = (GsuScalar) rc_carrier;
-            addmodulefd(rc_carrier->fdesc, FDT_INTERNAL);
+            // addmodulefd(rc_carrier->fdesc, FDT_INTERNAL);
         } else if (tpe == DB_KEY_TYPE_NONE) {
             redisFree(rc);
             if (lazy) {
@@ -1313,7 +1313,7 @@ redis_hash_untie(Param pm)
 
     if (rc) { /* paranoia */
         redisFree(rc);
-        fdtable[gsu_ext->fdesc] = FDT_UNUSED;
+        // fdtable[gsu_ext->fdesc] = FDT_UNUSED;
 
         /* Let hash fields know there's no backend */
         ((struct gsu_scalar_ext *)ht->tmpdata)->rc = NULL;
@@ -1490,7 +1490,7 @@ redis_str_untie(Param pm)
     if (gsu_ext->rc) { /* paranoia */
         redisFree(gsu_ext->rc);
         gsu_ext->rc = NULL;
-        fdtable[gsu_ext->fdesc] = FDT_UNUSED;
+        // fdtable[gsu_ext->fdesc] = FDT_UNUSED;
     }
 
     /* Remove from list of tied parameters */
@@ -1740,7 +1740,7 @@ redis_arrset_untie(Param pm)
     if (gsu_ext->rc) { /* paranoia */
         redisFree(gsu_ext->rc);
         gsu_ext->rc = NULL;
-        fdtable[gsu_ext->fdesc] = FDT_UNUSED;
+        // fdtable[gsu_ext->fdesc] = FDT_UNUSED;
     }
 
     /* Remove from list of tied parameters */
@@ -2232,7 +2232,7 @@ redis_hash_zset_untie(Param pm)
 
     if (rc) { /* paranoia */
         redisFree(rc);
-        fdtable[gsu_ext->fdesc] = FDT_UNUSED;
+        // fdtable[gsu_ext->fdesc] = FDT_UNUSED;
 
         /* Let hash fields know there's no backend */
         ((struct gsu_scalar_ext *)ht->tmpdata)->rc = NULL;
@@ -2835,7 +2835,7 @@ redis_hash_hset_untie(Param pm)
 
     if (rc) { /* paranoia */
         redisFree(rc);
-        fdtable[gsu_ext->fdesc] = FDT_UNUSED;
+        // fdtable[gsu_ext->fdesc] = FDT_UNUSED;
 
         /* Let hash fields know there's no backend */
         ((struct gsu_scalar_ext *)ht->tmpdata)->rc = NULL;
@@ -3083,7 +3083,7 @@ redis_arrlist_untie(Param pm)
     if (gsu_ext->rc) { /* paranoia */
         redisFree(gsu_ext->rc);
         gsu_ext->rc = NULL;
-        fdtable[gsu_ext->fdesc] = FDT_UNUSED;
+        // fdtable[gsu_ext->fdesc] = FDT_UNUSED;
     }
 
     /* Remove from list of tied parameters */
@@ -3492,14 +3492,14 @@ reconnect(redisContext **rc, int *fdesc, const char *hostspec_in, const char *pa
     redisFree(*rc);
     *rc = NULL;
 
-    fdtable[*fdesc] = FDT_UNUSED;
+    // fdtable[*fdesc] = FDT_UNUSED;
 
     if(!connect(rc, password, host, port, db_index, hostspec_in)) {
         zwarn("Not connected, retrying... Failed, aborting");
         return 0;
     } else {
         *fdesc = (*rc)->fd;
-        addmodulefd(*fdesc, FDT_INTERNAL);
+        // addmodulefd(*fdesc, FDT_INTERNAL);
         zwarn("Not connected, retrying... Success");
         return 1;
     }
