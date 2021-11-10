@@ -289,7 +289,7 @@ If using a plugin manager, then `Zplugin` is recommended, but you can use any
 other too, and also install with `Oh My Zsh` (by copying directory to
 `~/.oh-my-zsh/custom/plugins`).
 
-### [Zplugin](https://github.com/zdharma/zplugin)
+### [Zplugin](https://github.com/zdharma-continuum/zinit)
 
 Add `zplugin light zdharma/zredis` to your `.zshrc` file. Zplugin will handle
 cloning the plugin for you automatically the next time you start zsh. To update
