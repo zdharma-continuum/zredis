@@ -3,8 +3,10 @@
 [![Zredis](https://img.shields.io/badge/zredis-0.93-green.svg)](https://github.com/zdharma/zredis/releases)
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
+
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+**Table of Contents** *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [Zredis](#zredis)
   - [Rationale](#rationale)
@@ -20,18 +22,18 @@
     - [Redis list -> Zsh array](#redis-list---zsh-array)
     - [Redis string key -> Zsh string](#redis-string-key---zsh-string)
 - [Installation](#installation)
-    - [Zplugin](#zplugin)
-    - [Antigen](#antigen)
-    - [Oh-My-Zsh](#oh-my-zsh)
-    - [Zgen](#zgen)
+  - [Zplugin](#zplugin)
+  - [Antigen](#antigen)
+  - [Oh-My-Zsh](#oh-my-zsh)
+  - [Zgen](#zgen)
 - [Zredis Zstyles](#zredis-zstyles)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 # Zredis
 
-Zsh binary module written in C interfacing with `redis` database via `Zshell`
-`variables` mapped to `keys` or the whole `database`.
+Zsh binary module written in C interfacing with `redis` database via `Zshell` `variables` mapped to `keys` or the whole
+`database`.
 
 ```SystemVerilog
 # Create a hash `HASHSET' using the standard cli tool, holding 2 keys
@@ -60,11 +62,11 @@ key1 key2
 1) "key1"
 2) "key2"
 ```
+
 ## Rationale
 
-Building commands for `redis-cli` quickly becomes inadequate. For example, if copying
-of one hash to another one is needed, what `redis-cli` invocations are needed? With
-`zredis`, this task is simple:
+Building commands for `redis-cli` quickly becomes inadequate. For example, if copying of one hash to another one is
+needed, what `redis-cli` invocations are needed? With `zredis`, this task is simple:
 
 ```zsh
 % ztie -r -d db/redis -a "127.0.0.1/3/HASHSET1" hset1 # -r - read-only
@@ -78,11 +80,11 @@ key1 value1 key2 value2
 key1 value1 key2 value2
 ```
 
-The `"${(kv)hset1[@]}"` construct guarantees that empty elements (keys or values) will
-be preserved, thanks to quoting and `@` operator. `(kv)` means keys and values, alternating.
- 
-Or, for example, if one needs a large sorted set (`zset`), how to accomplish this with
-`redis-cli`? With `zredis`, one can do:
+The `"${(kv)hset1[@]}"` construct guarantees that empty elements (keys or values) will be preserved, thanks to quoting
+and `@` operator. `(kv)` means keys and values, alternating.
+
+Or, for example, if one needs a large sorted set (`zset`), how to accomplish this with `redis-cli`? With `zredis`, one
+can do:
 
 ```zsh
 % redis-cli -n 3 zadd NEWZSET 1.0 a
@@ -103,28 +105,25 @@ a b c d e f g h i j k l m n o p q r s t u v w x y z A B C D E F G H I J K L M N 
 
 ## Deleting From Database
 
-Unsetting the first type of mapped variable (Zsh hash -> whole database) doesn't cause a deletion from
-database. If option `-D` is given to `ztie` when binding to concrete key in database, then unsets, also
-caused by automatic Zsh scoping actions, cause the corresponding key to be deleted. `zuntie` never deletes
-from database.
+Unsetting the first type of mapped variable (Zsh hash -> whole database) doesn't cause a deletion from database. If
+option `-D` is given to `ztie` when binding to concrete key in database, then unsets, also caused by automatic Zsh
+scoping actions, cause the corresponding key to be deleted. `zuntie` never deletes from database.
 
-More: in Redis, removing all elements from a set, list, etc. means the same as deletion. So you can delete
-all datatypes except string, by doing `variable=()`. For string you can unset key in whole-database mapped
-hash: `unset 'wholedb[key]'`.
+More: in Redis, removing all elements from a set, list, etc. means the same as deletion. So you can delete all datatypes
+except string, by doing `variable=()`. For string you can unset key in whole-database mapped hash:
+`unset 'wholedb[key]'`.
 
 ## Compiling modules
 
-The Zsh modules provided by the plugin will build automatically (`hiredis` library is needed). You can
-start more than 1 shell, only the first one will be compiling. If a developer commits a new timestamp to
-`module/RECOMPILE_REQUEST`, the module will recompile (don't worry, at startup, `mtime` is checked
-first, so check for recompilation is fast). I do this when I add tested features or fixes. You can
-recompile the modules yourself by invoking Zsh function `zredis_compile`.
+The Zsh modules provided by the plugin will build automatically (`hiredis` library is needed). You can start more than 1
+shell, only the first one will be compiling. If a developer commits a new timestamp to `module/RECOMPILE_REQUEST`, the
+module will recompile (don't worry, at startup, `mtime` is checked first, so check for recompilation is fast). I do this
+when I add tested features or fixes. You can recompile the modules yourself by invoking Zsh function `zredis_compile`.
 
 ## Cache
 
-By default, reads are cached. If a tied variable is read for the first time,
-then database is accessed. For the second read there's no database access.
-Writes aren't cached in any way.
+By default, reads are cached. If a tied variable is read for the first time, then database is accessed. For the second
+read there's no database access. Writes aren't cached in any way.
 
 To clear the cache, invoke:
 
@@ -136,31 +135,36 @@ ztclear my_hashset_var key  # Also for types: whole-db mapping, zset
 To disable the cache, pass `-z` ("zero-cache") option to ztie.
 
 ## News
-* 2018-12-19
-  - The builtin `zrpush` can have the param-name argument skipped – if it's called for the second
-    time, meaning that a new special (but writeable) parameter has been set – `$zredis_last`. It
-    holds the param-name used in the 1st call and will be used in place of the `{pm-name}` argument.
-    The short call is then to look like the following: `zrpush {l|r} [ {val1} {val2} ... ]`.
 
-* 2018-12-18
-  - New builtin `zrpush {l|r} {pm-name} [ {val1} {val2} ... ]` that in an optimized manner pushes
-    the given elements `{val1} {val2}`, etc. onto the front or back (i.e. `l|r`, left or right,
-    head or tail) of the list tied to param `{pm-name}`.
+- 2018-12-19
+
+  - The builtin `zrpush` can have the param-name argument skipped – if it's called for the second time, meaning that a
+    new special (but writeable) parameter has been set – `$zredis_last`. It holds the param-name used in the 1st call
+    and will be used in place of the `{pm-name}` argument. The short call is then to look like the following:
+    `zrpush {l|r} [ {val1} {val2} ... ]`.
+
+- 2018-12-18
+
+  - New builtin `zrpush {l|r} {pm-name} [ {val1} {val2} ... ]` that in an optimized manner pushes the given elements
+    `{val1} {val2}`, etc. onto the front or back (i.e. `l|r`, left or right, head or tail) of the list tied to param
+    `{pm-name}`.
   - Hash-**set** operation (i.e. `hsh=( a b ...)`) has been greately optimized for over-internet tied hash parameters.
 
-* 2018-01-09
-  - New option to `ztie`: `-S`, which used in conjunction with `-L` (lazy binding) causes database connection
-    to be defered until first use of variable. Standard lazy binding means: key isn't required to exist.
+- 2018-01-09
 
-* 2018-01-08
-  - New option to `ztie`: `-D`, which causes mapped database key to be deleted on `unset` of the tied
-    variable. Up to this moment this behavior was the default.
+  - New option to `ztie`: `-S`, which used in conjunction with `-L` (lazy binding) causes database connection to be
+    defered until first use of variable. Standard lazy binding means: key isn't required to exist.
+
+- 2018-01-08
+
+  - New option to `ztie`: `-D`, which causes mapped database key to be deleted on `unset` of the tied variable. Up to
+    this moment this behavior was the default.
 
 ## Mapping Of Redis Types To Zsh Data Structures
+
 ### Database string keys -> Zsh hash
 
-Redis can store strings at given keys, using `SET` command. `Zredis` maps those to hash array
-(like Zsh `gdbm` module):
+Redis can store strings at given keys, using `SET` command. `Zredis` maps those to hash array (like Zsh `gdbm` module):
 
 ```
 % redis-cli -n 4 SET key1 value1
@@ -174,8 +178,8 @@ key1 value1 key2 value2
 
 ### Redis hash -> Zsh hash
 
-By appending `/NAME` to the `host-spec` (`-f` option), one can select single
-key of type `HASH` and map it to `Zsh` hash:
+By appending `/NAME` to the `host-spec` (`-f` option), one can select single key of type `HASH` and map it to `Zsh`
+hash:
 
 ```
 % redis-cli -n 4 hmset HASH key1 value1 key2 value2
@@ -193,10 +197,9 @@ key1 value1
 
 ### Redis set -> Zsh array
 
-Can clear single elements by assigning `()` to array element. Can overwrite
-whole set by assigning via `=( ... )` to set, and delete set from database
-by use of `unset`. Use `zuntie` to only detach variable from database without
-deleting any data.
+Can clear single elements by assigning `()` to array element. Can overwrite whole set by assigning via `=( ... )` to
+set, and delete set from database by use of `unset`. Use `zuntie` to only detach variable from database without deleting
+any data.
 
 ```
 % redis-cli -n 4 sadd SET value1 value2 value3 ''
@@ -217,8 +220,8 @@ value2 value3 value1
 
 ### Redis sorted set -> Zsh hash
 
-This variant maps `zset` as hash - keys are set elements, values are ranks.
-`zrzset` call outputs elements sorted according to the rank:
+This variant maps `zset` as hash - keys are set elements, values are ranks. `zrzset` call outputs elements sorted
+according to the rank:
 
 ```
 % redis-cli -n 4 zadd NEWZSET 1.0 a
@@ -276,8 +279,8 @@ value2
 
 # Installation
 
-**The plugin is "standalone"**, which means that only sourcing it is needed. So to
-install, unpack `zredis` somewhere and add
+**The plugin is "standalone"**, which means that only sourcing it is needed. So to install, unpack `zredis` somewhere
+and add
 
 ```SystemVerilog
 source {where-zredis-is}/zredis.plugin.zsh
@@ -285,31 +288,28 @@ source {where-zredis-is}/zredis.plugin.zsh
 
 to `zshrc`.
 
-If using a plugin manager, then `Zplugin` is recommended, but you can use any
-other too, and also install with `Oh My Zsh` (by copying directory to
-`~/.oh-my-zsh/custom/plugins`).
+If using a plugin manager, then `Zplugin` is recommended, but you can use any other too, and also install with
+`Oh My Zsh` (by copying directory to `~/.oh-my-zsh/custom/plugins`).
 
 ### [Zplugin](https://github.com/zdharma-continuum/zinit)
 
-Add `zplugin light zdharma/zredis` to your `.zshrc` file. Zplugin will handle
-cloning the plugin for you automatically the next time you start zsh. To update
-issue `zplugin update zdharma/zredis`.
+Add `zplugin light zdharma/zredis` to your `.zshrc` file. Zplugin will handle cloning the plugin for you automatically
+the next time you start zsh. To update issue `zplugin update zdharma/zredis`.
 
 ### Antigen
 
-Add `antigen bundle zdharma/zredis` to your `.zshrc` file. Antigen will handle
-cloning the plugin for you automatically the next time you start zsh.
+Add `antigen bundle zdharma/zredis` to your `.zshrc` file. Antigen will handle cloning the plugin for you automatically
+the next time you start zsh.
 
 ### Oh-My-Zsh
 
 1. `cd ~/.oh-my-zsh/custom/plugins`
-2. `git clone git@github.com:zdharma/zredis.git`
-3. Add `zredis` to your plugin list
+1. `git clone git@github.com:zdharma/zredis.git`
+1. Add `zredis` to your plugin list
 
 ### Zgen
 
-Add `zgen load zdharma/zredis` to your .zshrc file in the same place you're doing
-your other `zgen load` calls in.
+Add `zgen load zdharma/zredis` to your .zshrc file in the same place you're doing your other `zgen load` calls in.
 
 # Zredis Zstyles
 
